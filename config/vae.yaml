@@ -1,0 +1,58 @@
+# device: &device 'cpu'
+device: &device 'cuda'
+
+dataset_config:
+  data: 'smallMNIST' # ['MNIST', 'coloredMNIST', 'GaussianMixture']
+  root: '../_datasets/'
+  img_size: &img_size 28
+  input_channel: &input_channel 1
+  # data_dim: &D 32
+  # shortcut_ratio: 0.0
+  # num_class: &num_class 10
+  train_batch: 256
+  test_batch: 256
+  num_workers: 4
+
+vae_config:
+  d: &d 32 # latent dimensoin
+  beta: 1 # hyperparameter of the VIB
+  device: *device
+  prior: 'normal'
+  # num_pseudodata: 32
+  # num_kl_samples: 1000
+
+encoder_config:
+  type: 'IMG_MLP' # ['IMG_MLP', 'IMG_CNN', 'VEC_MLP']
+  d: *d
+  img_size: *img_size
+  input_channel: *input_channel
+  # input_dim: *D
+  # used for CNN encoder only
+  channels: [4, 8, 16, 32]
+  kernels: [3, 3, 3, 3]
+  strides: [2, 2, 1, 1]
+  paddings: [1, 1, 1, 1]
+  # used for MLP encoder only
+  hidden_dim: [500, 500]
+
+decoder_config:
+  type: 'IMG_MLP_C1' # ['IMG_CNN', 'VEC_MLP', IMG_CNN_C1, IMG_MLP_C1]
+  d: *d
+  img_size: *img_size
+  input_channel: *input_channel
+  # input_dim: *D
+  # used for MLP decoder only
+  hidden_dim: [500, 500]
+
+trainer_config:
+  num_epoch: 10000
+  evaluate_every: 200
+  save_every: 200
+  # aug: 'none'
+
+optimizer_config:
+  lr: 3e-4
+  adam_betas: (0.9, 0.999)
+  adam_eps: 1e-8
+  weight_decay: 0.0
+  enable_amp: False

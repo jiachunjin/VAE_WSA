@@ -1,0 +1,81 @@
+device: &device 'cuda'
+# device: &device 'cpu'
+
+dataset_config:
+  # data: 'binaryMNIST' # ['MNIST', 'smallMNIST', 'GaussianMixture', 'binaryMNIST', 'OMNIGLOT', 'silhouettes', 'CIFAR10']
+  root: '../_datasets/'
+  img_size: &img_size 28
+  input_channel: &input_channel 1
+  # data_dim: &D 32
+  train_batch: 200
+  test_batch: 200
+  num_workers: 2
+
+vae_config:
+  d: &d 28
+  beta: 1
+  device: *device
+  dtype: 'continuous' # ['binary', 'continuous']
+
+encoder_config:
+  type: 'IMG_CNN' # ['IMG_MLP', 'IMG_CNN', 'VEC_MLP']
+  d: *d
+  img_size: *img_size
+  input_channel: *input_channel
+  dropout_p: 0.0
+  # used for CNN encoder only
+  channels: [4, 8, 16, 32]
+  kernels: [3, 3, 3, 3]
+  strides: [2, 2, 1, 1]
+  paddings: [1, 1, 1, 1]
+  # used for MLP encoder only
+  hidden_dim: [500, 500]
+
+decoder_config:
+  type: 'IMG_CNN_C1' # ['IMG_CNN_32', 'VEC_MLP', IMG_CNN_C1, IMG_MLP_C1]
+  d: *d
+  img_size: *img_size
+  input_channel: *input_channel
+  dropout_p: 0.0
+  # used for MLP decoder only
+  hidden_dim: [500, 500]
+
+classifier_config:
+  type: 'IMG_CNN' # ['IMG_MLP', 'IMG_CNN']
+  img_size: *img_size
+  input_channel: *input_channel
+  # used for CNN encoder only
+  channels: [2, 4, 8]
+  kernels: [3, 3, 3]
+  strides: [1, 1, 1]
+  paddings: [1, 1, 1]
+  # used for MLP encoder only
+  hidden_dim: [500, 500]
+
+trainer_config:
+  num_epoch: 5000
+  evaluate_every: 5
+  save_every: 100
+  aug_epoch: 50
+  num_batch_aug_samples: 4
+  weight_clamp_min: 0
+  weight_clamp_max: 1000
+  weight_thres: 0
+
+optimizer_config:
+  lr: 5e-4
+
+
+# below is VAEBM config
+# energy_config:
+#   hidden_dim: [500, 500]
+#   img_size: *img_size
+#   input_channel: *input_channel
+#   regularize_coeff: 5
+# sampler_config:
+#   num_steps_train: 10
+#   num_steps_test: 10
+#   alpha: 0.5
+#   noise_std: 0.0075
+# ebm_optimizer_config:
+#   lr: 5e-5
